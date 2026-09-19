@@ -1,12 +1,26 @@
 // 待辦清單應用程式：使用原生 JavaScript 實作，資料儲存於 localStorage
 (function () {
   const STORAGE_KEY = "todo-list-items";
+  const THEME_STORAGE_KEY = "todo-list-theme";
 
   const form = document.getElementById("todo-form");
   const input = document.getElementById("todo-input");
   const list = document.getElementById("todo-list");
   const emptyMessage = document.getElementById("empty-message");
   const remainingCount = document.getElementById("remaining-count");
+  const themeToggle = document.getElementById("theme-toggle");
+  const themeToggleIcon = document.getElementById("theme-toggle-icon");
+  const themeToggleText = document.getElementById("theme-toggle-text");
+  const filterRow = document.getElementById("filter-row");
+
+  // 篩選狀態文字對應的提示訊息
+  const EMPTY_MESSAGES = {
+    all: "還沒有任何待辦事項,新增一個吧!",
+    active: "目前沒有未完成的待辦事項!",
+    completed: "目前沒有已完成的待辦事項!",
+  };
+
+  let currentFilter = "all";
 
   // 從 localStorage 讀取資料，讀取失敗時回傳空陣列
   function loadTodos() {
@@ -25,14 +39,74 @@
 
   let todos = loadTodos();
 
+  // 套用主題並更新切換按鈕上的圖示與文字
+  function applyTheme(theme) {
+    if (theme === "dark") {
+      document.documentElement.setAttribute("data-theme", "dark");
+      themeToggleIcon.textContent = "☀️";
+      themeToggleText.textContent = "淺色模式";
+    } else {
+      document.documentElement.removeAttribute("data-theme");
+      themeToggleIcon.textContent = "🌙";
+      themeToggleText.textContent = "深色模式";
+    }
+  }
+
+  // 初始化主題：優先採用使用者手動設定，否則跟隨作業系統偏好
+  function initTheme() {
+    const savedTheme = localStorage.getItem(THEME_STORAGE_KEY);
+    if (savedTheme === "dark" || savedTheme === "light") {
+      applyTheme(savedTheme);
+      return;
+    }
+
+    const prefersDark = window.matchMedia("(prefers-color-scheme: dark)").matches;
+    applyTheme(prefersDark ? "dark" : "light");
+  }
+
+  themeToggle.addEventListener("click", () => {
+    const isDark = document.documentElement.getAttribute("data-theme") === "dark";
+    const nextTheme = isDark ? "light" : "dark";
+    applyTheme(nextTheme);
+    localStorage.setItem(THEME_STORAGE_KEY, nextTheme);
+  });
+
+  // 依目前篩選條件切換選中按鈕的樣式
+  filterRow.addEventListener("click", (event) => {
+    const button = event.target.closest(".filter-btn");
+    if (!button) {
+      return;
+    }
+
+    currentFilter = button.dataset.filter;
+    Array.from(filterRow.children).forEach((btn) => {
+      btn.classList.toggle("active", btn === button);
+    });
+    render();
+  });
+
+  // 依目前篩選條件回傳要顯示的待辦事項
+  function getFilteredTodos() {
+    if (currentFilter === "active") {
+      return todos.filter((todo) => !todo.completed);
+    }
+    if (currentFilter === "completed") {
+      return todos.filter((todo) => todo.completed);
+    }
+    return todos;
+  }
+
   // 依照目前的 todos 陣列重新渲染整個清單
   function render() {
     list.innerHTML = "";
 
-    // 清單為空時顯示提示文字，否則隱藏
-    emptyMessage.style.display = todos.length === 0 ? "block" : "none";
+    const filteredTodos = getFilteredTodos();
 
-    todos.forEach((todo) => {
+    // 篩選後清單為空時，顯示對應的提示文字
+    emptyMessage.style.display = filteredTodos.length === 0 ? "block" : "none";
+    emptyMessage.textContent = EMPTY_MESSAGES[currentFilter];
+
+    filteredTodos.forEach((todo) => {
       const li = document.createElement("li");
       li.className = "todo-item" + (todo.completed ? " completed" : "");
 
@@ -56,6 +130,7 @@
       list.appendChild(li);
     });
 
+    // 未完成筆數永遠以整體資料計算，不受篩選影響
     const remaining = todos.filter((todo) => !todo.completed).length;
     remainingCount.textContent = `未完成:${remaining} 項`;
   }
@@ -101,5 +176,6 @@
     input.focus();
   });
 
+  initTheme();
   render();
 })();

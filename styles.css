@@ -1,4 +1,4 @@
-/* 顏色與樣式變數，統一集中管理 */
+/* 顏色與樣式變數，統一集中管理（淺色為預設值） */
 :root {
   --color-bg: #f2f4f7;
   --color-card-bg: #ffffff;
@@ -9,8 +9,26 @@
   --color-border: #e3e6eb;
   --color-danger: #e5566d;
   --color-danger-hover: #cf3f56;
+  --color-btn-bg: #eef0f4;
+  --color-btn-text: #2b2f38;
   --radius: 12px;
   --shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
+}
+
+/* 深色模式配色：由 data-theme="dark" 觸發，覆寫同一組 CSS 變數 */
+[data-theme="dark"] {
+  --color-bg: #14161c;
+  --color-card-bg: #1f222b;
+  --color-primary: #6d87ff;
+  --color-primary-hover: #8398ff;
+  --color-text: #e6e8ef;
+  --color-text-muted: #8a8f9c;
+  --color-border: #333743;
+  --color-danger: #f0788c;
+  --color-danger-hover: #f4909f;
+  --color-btn-bg: #2a2e39;
+  --color-btn-text: #e6e8ef;
+  --shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
 }
 
 * {
@@ -27,6 +45,7 @@ body {
   background-color: var(--color-bg);
   font-family: "Microsoft JhengHei", "PingFang TC", -apple-system, BlinkMacSystemFont, sans-serif;
   color: var(--color-text);
+  transition: background-color 0.2s ease, color 0.2s ease;
 }
 
 /* 卡片式版面，置中並限制最大寬度 */
@@ -39,10 +58,57 @@ body {
   padding: 24px;
 }
 
+/* 標題與深色模式切換按鈕同一列排列 */
+.header-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 20px;
+}
+
 h1 {
-  margin: 0 0 20px;
+  margin: 0;
   font-size: 1.5rem;
-  text-align: center;
+}
+
+.theme-toggle {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 10px;
+  border: 1px solid var(--color-border);
+  border-radius: 8px;
+  background-color: var(--color-btn-bg);
+  color: var(--color-btn-text);
+  font-size: 0.85rem;
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+.filter-row {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 16px;
+}
+
+.filter-btn {
+  flex: 1;
+  padding: 8px 0;
+  border: 1px solid var(--color-border);
+  border-radius: 8px;
+  background-color: var(--color-btn-bg);
+  color: var(--color-btn-text);
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition: background-color 0.2s ease, color 0.2s ease;
+}
+
+/* 目前選中的篩選按鈕要有明顯樣式 */
+.filter-btn.active {
+  background-color: var(--color-primary);
+  color: #fff;
+  border-color: var(--color-primary);
 }
 
 .input-row {
@@ -158,5 +224,9 @@ h1 {
 
   .input-row button {
     width: 100%;
+  }
+
+  .theme-toggle span:last-child {
+    display: none;
   }
 }
