@@ -13,11 +13,11 @@
   const themeToggleText = document.getElementById("theme-toggle-text");
   const filterRow = document.getElementById("filter-row");
 
-  // 篩選狀態文字對應的提示訊息
+  // 篩選狀態文字對應的提示訊息(明確告知使用者資料只是被篩選掉,不是被刪除)
   const EMPTY_MESSAGES = {
     all: "還沒有任何待辦事項,新增一個吧!",
-    active: "目前沒有未完成的待辦事項!",
-    completed: "目前沒有已完成的待辦事項!",
+    active: "目前沒有未完成的待辦事項(其他項目並未消失,切換到「全部」即可查看)",
+    completed: "目前沒有已完成的待辦事項(其他項目並未消失,切換到「全部」即可查看)",
   };
 
   let currentFilter = "all";

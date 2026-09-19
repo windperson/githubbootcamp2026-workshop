@@ -22,6 +22,7 @@ argument-hint: 'issueNumber=3'
 ## 3. 建立分支
 
 ```
+git switch main
 git switch -c fix/issue-${input:issueNumber}
 ```
 
