@@ -1,4 +1,4 @@
-請建立 .github/copilot-instructions.md,用繁體中文寫,內容要包含以下規則:
+# 專案規範
 
 【技術限制】
 - 這是純前端專案,只用 HTML、CSS、原生 JavaScript
