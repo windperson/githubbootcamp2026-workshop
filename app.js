@@ -2,6 +2,7 @@
 (function () {
   const STORAGE_KEY = "todo-list-items";
   const THEME_STORAGE_KEY = "todo-list-theme";
+  const FILTER_STORAGE_KEY = "todo-list-filter";
 
   const form = document.getElementById("todo-form");
   const input = document.getElementById("todo-input");
@@ -71,7 +72,25 @@
     localStorage.setItem(THEME_STORAGE_KEY, nextTheme);
   });
 
-  // 依目前篩選條件切換選中按鈕的樣式
+  // 依篩選值切換選中按鈕的樣式
+  function applyFilterButtonStyle(filter) {
+    Array.from(filterRow.children).forEach((btn) => {
+      btn.classList.toggle("active", btn.dataset.filter === filter);
+    });
+  }
+
+  // 初始化篩選條件：從 localStorage 讀取上次選擇，值不合法時安全回退成「全部」
+  function initFilter() {
+    const savedFilter = localStorage.getItem(FILTER_STORAGE_KEY);
+    if (savedFilter === "all" || savedFilter === "active" || savedFilter === "completed") {
+      currentFilter = savedFilter;
+    } else {
+      currentFilter = "all";
+    }
+    applyFilterButtonStyle(currentFilter);
+  }
+
+  // 依目前篩選條件切換選中按鈕的樣式，並將選擇存進 localStorage
   filterRow.addEventListener("click", (event) => {
     const button = event.target.closest(".filter-btn");
     if (!button) {
@@ -79,9 +98,8 @@
     }
 
     currentFilter = button.dataset.filter;
-    Array.from(filterRow.children).forEach((btn) => {
-      btn.classList.toggle("active", btn === button);
-    });
+    localStorage.setItem(FILTER_STORAGE_KEY, currentFilter);
+    applyFilterButtonStyle(currentFilter);
     render();
   });
 
@@ -177,5 +195,6 @@
   });
 
   initTheme();
+  initFilter();
   render();
 })();
